@@ -1,6 +1,7 @@
 import datetime
 import time
 import pandas as pd
+import numpy as np
 
 def connection_test():
     return 1
@@ -74,5 +75,29 @@ for minute in range(0,60):
         bestfrequency = (minute,frequency)
 mostFrequentMinute = bestfrequency[0]
 
-print("Lösung: {}".format(mostFrequentMinute * guard))
+print("Lösung1: {}".format(mostFrequentMinute * guard))
 
+
+guardMinuteSleep = guardSleepingTimes.drop("delta", axis = 1)
+
+for column in guardMinuteSleep.loc[:, ["start","end"]].columns:
+    for index in range(len(guardMinuteSleep)):
+        guardMinuteSleep.loc[index, column] = guardMinuteSleep.loc[index, column].minute
+
+
+# Für jeden Guard übertrage die jeweiligen Schlafzeiten im 1 zu 1 Format in eine Tabelle
+guardOverview = pd.DataFrame(columns=range(60))
+
+for guard in guardMinuteSleep.guard.unique():
+    minutesList = list()
+    for index in guardMinuteSleep.loc[guardMinuteSleep.guard == str(guard), :].index:
+        for minute in range(guardMinuteSleep.loc[index,"start"], guardMinuteSleep.loc[index,"end"]):
+            minutesList.append(minute)
+    minutesSeries = pd.Series(minutesList, name = guard)
+    guardOverview = guardOverview.append(minutesSeries.value_counts())
+
+
+highestValue = guardOverview.where(guardOverview == guardOverview.max().max()).dropna(axis = 1, how="all").dropna(axis = 0, how="all")
+
+result = int(highestValue.index[0]) * int(highestValue.columns[0])
+print("Lösung2: {}".format(result))
