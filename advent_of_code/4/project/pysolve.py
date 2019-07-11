@@ -28,44 +28,51 @@ def calculate_timeDelta(timestamp_later_index, timestamp_earlier_index):
 def strip_guard_text(string):
     return string.lstrip("Guard #").rstrip(" begins shift")
 
+def extract_minutes(dateTime):
+    return dateTime.minute
+
 
 chosen_minute = 0
 guardID = 0
 sameGuard = True
 guardSleepingTimes = pd.DataFrame(columns=["guard", "start", "end", "delta"])
 
-# Lese alle Daten ein + Bereinige Sie
 sleepList = [line.rstrip('\n') for line in open('advent_of_code/4/project/input.txt')]
 sleepList = list(map(lambda x: split_sleep_entry(x),sleepList))
-# Formatiere die Anfangsdaten als time-Werte
+
 for entry in sleepList:
     entry[0] = convert_to_timestamp(entry[0])
-# Sortiere die Daten chronologisch
-sleepDf = pd.DataFrame(sleepList, columns=["time", "action"]).sort_values(by=['time']).reset_index(drop = True)
 
-print("{}\n".format(sleepDf.head(10)))
+sleepDf = pd.DataFrame(sleepList, columns=["time", "action"]).sort_values(by=['time']).reset_index(drop = True)
 
 for index, entry in enumerate(sleepDf.loc[:,"action"]):
     if entry.startswith("Guard"):
         guard = strip_guard_text(entry)
     elif entry.startswith("falls asleep"):
-        durationDf = create_durationDf(index, guard)
-        guardSleepingTimes = guardSleepingTimes.append(durationDf.T, ignore_index = True)
+        durationDf = create_durationDf(index, guard).T
+        guardSleepingTimes = guardSleepingTimes.append(durationDf, ignore_index = True)
 
-print(guardSleepingTimes)
-
+highSleep = (0, datetime.timedelta())
 for guard in guardSleepingTimes.guard.unique():
-    print("Guard: {}, Time: {}".format(guard, guardSleepingTimes.loc[guardSleepingTimes.guard == guard, "delta"].sum()))
+    sleepTime = guardSleepingTimes.loc[guardSleepingTimes.guard == guard, "delta"].sum()
+    if  sleepTime > highSleep[1]:
+        highSleep = (guard, sleepTime)
+guard = int(highSleep[0])
 
-# Errechne wie lange die Guards schlafen
+bestguardSleep = guardSleepingTimes.loc[guardSleepingTimes.guard == "3041",["start", "end"]].reset_index().drop("index", axis = 1)
+for column in bestguardSleep.columns:
+    for index in range(len(bestguardSleep)):
+        bestguardSleep.loc[index, column] = bestguardSleep.loc[index, column].minute
 
-#   Wenn Guard steht fange die Berechnung für einen Guard an / oder setze ihn auf die Liste.
+bestfrequency = (0,0)
+for minute in range(0,60):
+    frequency = 0
+    for entrie in range(len(bestguardSleep)):
+        if minute >= bestguardSleep.iloc[entrie,0] and minute < bestguardSleep.iloc[entrie,1]:
+            frequency += 1
+    if frequency > bestfrequency[1]:
+        bestfrequency = (minute,frequency)
+mostFrequentMinute = bestfrequency[0]
 
-# HIGHSCORE: Wache Nr. 3041
-
-# Finde heraus, in welcher Minute er am Meisten schläft (Minute)
-
-# Errechne die Lösung
-
-#print("Lösung: {}".format(chosen_minute * guardID))
+print("Lösung: {}".format(mostFrequentMinute * guard))
 
