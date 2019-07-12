@@ -1,5 +1,6 @@
 import string
 import time
+import smtplib, ssl
 
 def connection_test():
     return 1
@@ -52,20 +53,41 @@ def list_to_string(list):
     string = ''.join(list)
     return string
 
-# 1 Schmeiß einen Buchstaben aus dem String Beispiel: "A" und "a"
-# 2 Lass es voll durchlaufen
-# 3 Schau zu, welches Ergebnis das kürzeste ist.
 
+password = input("Type your password and press enter: ")
 alphabet = list(string.ascii_lowercase)
-highscore = {"letter" : "", "length": 0}
+highscore = ["",10774]
 
+solutionstring = ""
 for letter in alphabet:
     for string in open ("advent_of_code/5/project/input.txt"):
-        startTime = time.time()
         shorter_string = string.replace(letter, "").replace(letter.swapcase(), "")
         solution = correct_string(shorter_string)
-        if len(solution) < highscore["length"]:
-            highscore["letter"] = letter.upper()
-            highscore["length"] = len(solution)
-        timeDelta = time.strftime("%H:%M", time.time() - startTime)
-        print("Letter: {}    Length: {}     Time: {}".format(letter.upper(), len(solution), timeDelta))
+        if len(solution) < highscore[1]:
+            highscore[0] = letter.upper()
+            highscore[1] = len(solution)
+        solutionstring += "Letter: {}    Length: {}\n".format(letter.upper(), len(solution))
+
+print(solutionstring)
+print(highscore)
+# Sending Email because it takes so long.
+
+
+
+def send_email(solutionstring, password):
+    port = 465  # For SSL
+    smtp_server = "smtp.gmail.com"
+    sender_email = "ben.lenkostendorf@gmail.com"  # Enter your address
+    receiver_email = "bernardon@hotmail.de"  # Enter receiver address
+    password = password
+    message = """Subject: Deine Ergebnisse\n 
+
+    {} \n
+        
+        
+    LG Ben""".format(solutionstring)
+
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(sender_email, receiver_email, message)
