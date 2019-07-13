@@ -36,19 +36,52 @@ def delete_listitem(listing, nextStep):
     listing = np.delete(listing, index)
     return listing
 
-data = loadData("advent_of_code/7/project/input.txt")
+def remove_used_condition(requirements, steps, nextStep):
+        deleteList = []
+        for index, item in enumerate(requirements):
+                if item == nextStep:
+                        deleteList.append(index)
+        reversedDeleteList = deleteList[::-1]
+        for deleteIndex in reversedDeleteList:
+                requirements.pop(deleteIndex)
+                steps.pop(deleteIndex)
+        return requirements, steps
 
-conditions = transform_into_conditions(data)
-requirements = extract_listinfo(conditions, 0)
-steps = extract_listinfo(conditions, 1)
+def create_result(requirements, steps):
+        result = ""
 
-result = ""
-nextStep = find_nextStep(requirements, steps)
-result = result.join(nextStep)
+        while True:
+                nextStep = find_nextStep(requirements, steps)
+                result += nextStep
+                requirements, steps = remove_used_condition(requirements, steps, nextStep)
+
+                if len(steps) == 1:
+                        result += requirements[0]
+                        result += steps[0]
+                        break
+
+        return result
+
+def solve_riddle_1():
+        data = loadData("advent_of_code/7/project/input.txt")
+        conditions = transform_into_conditions(data)
+        requirements = extract_listinfo(conditions, 0)
+        steps = extract_listinfo(conditions, 1)
+        result = create_result(requirements, steps)
+        print(result)
+
+#solve_riddle_1()
 
 
-for index, item in enumerate(requirements):
-    data = zip(requirements,steps)
-    if item == nextStep:
-        print(index)
-print(set(data))
+# Riddle two is about the same riddle, but!
+# When you want to add a letter you have to care if
+# A worker is free. Otherwise you have to wait, till
+# the workers are done and than give the next step.
+
+# 0 Start (start counting)
+# 1 What are the letters to do?
+# 2 Give the letters to the people in alphabetical order
+# 3 Wait one tick. 
+# 4 Is anything ready? No: GO to 3; Yes: Go to 2
+# Break, when all letters are done.
+# Print(iterations)
