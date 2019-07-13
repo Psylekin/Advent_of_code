@@ -9,5 +9,12 @@ class TestFunctions(unittest.TestCase):
         result = pysolve.connection_test()
         self.assertAlmostEqual(result, 1)
 
+    def test_solve_riddle_1(self):
+        """
+        Test if the riddle is correctly solved.
+        """
+        result = pysolve.solve_riddle_1()
+        self.assertEqual(result, "CABDFE")
+
 if __name__ == '__main__':
     unittest.main()
