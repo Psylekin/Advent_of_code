@@ -49,7 +49,6 @@ def remove_used_condition(requirements, steps, nextStep):
 
 def create_result(requirements, steps):
         result = ""
-
         while True:
                 nextStep = find_nextStep(requirements, steps)
                 result += nextStep
@@ -85,3 +84,16 @@ def solve_riddle_1():
 # 4 Is anything ready? No: GO to 3; Yes: Go to 2
 # Break, when all letters are done.
 # Print(iterations)
+
+"""
+data = loadData("advent_of_code/7/project/input.txt")
+conditions = transform_into_conditions(data)
+requirements = extract_listinfo(conditions, 0)
+steps = extract_listinfo(conditions, 1)
+capacity = 2
+
+result = ""
+tick = 0
+
+nextStep = find_nextStep(requirements, steps)
+"""
