@@ -1,6 +1,8 @@
 import unittest
 from project import pysolve
 
+import re
+
 class TestFunctions(unittest.TestCase):
     def test_connection_to_project(self):
         """
@@ -15,7 +17,7 @@ class TestFunctions(unittest.TestCase):
         """
         input = "position=< 21188,  31669> velocity=<-2, -3>"
         result = pysolve.transform_input(input)
-        solution = {"position": (21188, 31669), "velocity" : (-2 , -3)}
+        solution = [21188, 31669, -2 , -3]
         self.assertEqual(result, solution)
 
 if __name__ == '__main__':

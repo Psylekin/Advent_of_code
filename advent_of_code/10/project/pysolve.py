@@ -1,23 +1,41 @@
+import re
+import pandas as pd
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+
 def connection_test():
     return 1
 
-myDict = {
-    1 : {
-        "position" : (2,3),
-        "direction" : (1,2)
-    },
-    2 : {
-        "position" : (1,3),
-        "direction" : (1,2)
-    }
-}
-
-print(myDict[1]["position"])
-
-
-input = "position=< 21188,  31669> velocity=<-2, -3>"
 def transform_input(input):
-    print(dictionary = eval(input.replace("position=< ", "'{position' : (").replace("velocity=<", "'velocity' : (" ).replace(">", "),", 1).replace(">", ")},")))
+    return list(map(int, re.findall(r'\-?\d+', input)))
+
+def load_data_in_df(): #untested
+    with open("project/input.txt") as document:
+        data = document.readlines()
+        data = list(map(lambda x: transform_input(x), data))
+        df = pd.DataFrame(data, columns=["X", "Y", "VeloX", "VeloY"])
+        return df
+
+def add_velocity(dataDf, days): #untested
+    dataDf.X += dataDf.VeloX * days
+    dataDf.Y += dataDf.VeloY * days
+    return dataDf
+
+def report_findings_in_line(coordinate, newDataDf):
+    return newDataDf.loc[:, coordinate].value_counts()[:2]
+
+dataDf = load_data_in_df()
+highestValue = 0
+
+for days in range(1000):
+    newDataDf = add_velocity(dataDf, 1)
+    print(
+        report_findings_in_line("Y", newDataDf)
+    )
 
 
-transform_input(input)
+"""
+sns.jointplot(x=df.X, y=df.Y, kind='scatter')
+plt.show()
+"""
