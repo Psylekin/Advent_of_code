@@ -22,20 +22,27 @@ def add_velocity(dataDf, days): #untested
     dataDf.Y += dataDf.VeloY * days
     return dataDf
 
-def report_findings_in_line(coordinate, newDataDf):
-    return newDataDf.loc[:, coordinate].value_counts()[:2]
+newDataDf = dataDf = load_data_in_df()
+lowestValue = 222
 
-dataDf = load_data_in_df()
-highestValue = 0
+for day in range(12000):
+    newDataDf = add_velocity(newDataDf, 1)
+    if len(newDataDf.X.unique()) < lowestValue:
+        plt.clf()
+        lowestValue = len(newDataDf.X.unique())
+        lowestDay = day
+        newDataDf.plot.scatter(x="X",y="Y")
+        plt.show()
 
-for days in range(1000):
-    newDataDf = add_velocity(dataDf, 1)
-    print(
-        report_findings_in_line("Y", newDataDf)
-    )
+print("Day: {}, Value: {}".format(lowestDay, lowestValue))
+plt.clf()
+add_velocity(dataDf, lowestDay -1).plot.scatter(x="X",y="Y")
+add_velocity(dataDf, lowestDay +1).plot.scatter(x="X",y="Y")
+add_velocity(dataDf, lowestDay +2).plot.scatter(x="X",y="Y")
+add_velocity(dataDf, lowestDay +3).plot.scatter(x="X",y="Y")
+add_velocity(dataDf, lowestDay +4).plot.scatter(x="X",y="Y")
+add_velocity(dataDf, lowestDay +5).plot.scatter(x="X",y="Y")
+add_velocity(dataDf, lowestDay +6).plot.scatter(x="X",y="Y")
+add_velocity(dataDf, lowestDay +7).plot.scatter(x="X",y="Y")
 
-
-"""
-sns.jointplot(x=df.X, y=df.Y, kind='scatter')
 plt.show()
-"""
